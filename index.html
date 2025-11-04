@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bayaning Pilipino: Heroes of the Philippines</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+  <!-- Animate.css for entrance effects -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <style>
+    :root {
+      --flag-blue: #0033a0;
+      --flag-red: #ce1126;
+      --flag-yellow: #ffd700;
+      --flag-white: #fff;
+      --overlay-dark: rgba(28,44,91,0.52);
+      --overlay-light: rgba(255,255,255,0.22);
+      --modern-hero-blue: #2782B1;
+      --modern-hero-green: #27B185;
+      --modern-hero-red: #B1274A;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Montserrat', Arial, sans-serif;
+      color: #fff;
+      overflow-x: hidden;
+      background: var(--flag-white);
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+    }
+    #flag-bg {
+      position: fixed;
+      z-index: 0;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100vw; height: 100vh;
+      overflow: hidden;
+      pointer-events: none;
+      background: var(--flag-white);
+    }
+    #flag-canvas {
+      width: 100vw; height: 100vh;
+      display: block;
+    }
+    #overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(120deg, var(--overlay-dark) 65%, var(--overlay-light) 100%);
+      z-index: 1;
+      pointer-events: none;
+    }
+    header {
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow: 0 2px 16px 0 rgba(0,0,0,0.10);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1vw 3vw;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+    .logo {
+      font-family: 'Righteous', cursive;
+      font-size: 2.4rem;
+      letter-spacing: 3px;
+      color: var(--flag-yellow);
+      text-shadow: 2px 2px #1c2c5b;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    nav {
+      display: flex;
+      gap: 1.5vw;
+      font-size: 1.2rem;
+      z-index: 10;
+    }
+    nav button {
+      background: none;
+      border: none;
+      color: var(--flag-yellow);
+      font-weight: bold;
+      cursor: pointer;
+      transition: color 0.2s;
+      padding: 0.4em 0.8em;
+      border-radius: 10px;
+    }
+    nav button.active, nav button:hover {
+      background: var(--flag-yellow);
+      color: #1c2c5b;
+    }
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 3vw 2vw;
+      min-height: 70vh;
+      position: relative;
+      z-index: 5;
+    }
+    .title-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      margin-top: 5vh;
+    }
+    .title-card h1 {
+      font-size: 3.2rem;
+      color: var(--flag-yellow);
+      text-shadow: 4px 4px #1c2c5b;
+      letter-spacing: 2px;
+      animation: bounceInDown 1.5s;
+    }
+    .title-card p {
+      font-size: 1.3rem;
+      margin-top: 0.5rem;
+      color: #fff;
+      max-width: 600px;
+      text-align: center;
+      animation: fadeIn 2.5s;
+      text-shadow: 1px 1px 5px #1c2c5b;
+    }
+    /* Start Btn - steady w/ effects */
+    .start-btn {
+      background: linear-gradient(90deg, var(--flag-yellow) 60%, #FFF6A9 100%);
+      color: #1c2c5b;
+      border: none;
+      padding: 1em 2em;
+      font-size: 1.3rem;
+      border-radius: 40px;
+      font-weight: bold;
+      box-shadow: 0 2px 16px 0 rgba(0,0,0,0.18);
+      cursor: pointer;
+      /* Remove bounce animation, add steady shadow glow and hover pulse */
+      transition: 
+        background 0.2s, 
+        box-shadow 0.3s, 
+        transform 0.16s;
+      box-shadow: 0 0 20px #FFD70055, 0 2px 12px #FFD70044;
+      position: relative;
+      outline: none;
+    }
+    .start-btn:after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      width: 75px; height: 75px;
+      border-radius: 50%;
+      box-shadow: 0 0 30px #FFD70066;
+      opacity: 0.2;
+      pointer-events: none;
+      z-index: -1;
+    }
+    .start-btn:hover, .start-btn:focus {
+      background: var(--flag-yellow);
+      box-shadow: 0 0 40px #FFD70099, 0 2px 20px #FFD70077;
+      transform: scale(1.05);
+    }
+    .start-btn svg {
+      vertical-align: middle;
+      margin-right: 10px;
+      margin-bottom: 2px;
+      width: 1.3em;
+      height: 1.3em;
+      fill: #1c2c5b;
+      filter: drop-shadow(0 0 6px #FFD70099);
+      transition: fill 0.2s;
+    }
+    .start-btn:hover svg {
+      fill: #FFD700;
+    }
+
+    .player-input {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      margin-top: 6vh;
+      animation: fadeIn 1.5s;
+    }
+    .player-input label {
+      font-size: 1.3rem;
+      letter-spacing: 1px;
+      font-weight: bold;
+      color: var(--flag-yellow);
+      text-shadow: 1px 1px #1c2c5b;
+      margin-bottom: 0.5rem;
+    }
+    .player-input input {
+      padding: 0.8em 2em;
+      font-size: 1.1rem;
+      border-radius: 20px;
+      border: none;
+      outline: none;
+      background: #fff;
+      color: #1c2c5b;
+      width: 250px;
+      text-align: center;
+    }
+    .player-input button {
+      background: linear-gradient(90deg, var(--flag-yellow) 60%, #FFF6A9 100%);
+      color: #1c2c5b;
+      border: none;
+      padding: 0.7em 1.7em;
+      font-size: 1.1rem;
+      border-radius: 30px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .section {
+      display: none;
+      animation: fadeIn 1s;
+    }
+    .section.active {
+      display: block;
+    }
+    .home-choices {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2vw;
+      justify-content: center;
+      margin-top: 3vh;
+    }
+    .home-card {
+      background: rgba(255,255,255,0.12);
+      border-radius: 22px;
+      padding: 2em 1.8em;
+      box-shadow: 0 4px 18px 0 rgba(0,0,0,0.13);
+      min-width: 180px;
+      max-width: 240px;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+      font-size: 1.2rem;
+      color: var(--flag-yellow);
+      font-weight: bold;
+      margin-bottom: 1em;
+      position: relative;
+      overflow: hidden;
+      text-shadow: 1px 1px 6px #1c2c5b;
+      z-index: 2;
+    }
+    .home-card:hover {
+      background: var(--flag-yellow);
+      color: #1c2c5b;
+      transform: scale(1.06);
+    }
+    .card-anim {
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      right: -20px;
+      bottom: -20px;
+      opacity: 0.15;
+      pointer-events: none;
+      animation: spin 5s linear infinite;
+    }
+    @keyframes spin {
+      100% { transform: rotate(360deg);}
+    }
+    /* Modern Hero Cards */
+    .modern-heroes-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2em;
+      justify-content: center;
+      margin-top: 2vh;
+      margin-bottom: 2vh;
+    }
+    .modern-hero-card {
+      background: linear-gradient(120deg, var(--modern-hero-blue) 70%, var(--modern-hero-green) 100%);
+      border-radius: 20px;
+      box-shadow: 0 2px 18px #2782B188;
+      width: 170px;
+      padding: 1.5em 1.2em;
+      text-align: center;
+      color: #fff;
+      font-weight: bold;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.18s, box-shadow 0.18s;
+    }
+    .modern-hero-card:hover {
+      transform: scale(1.04);
+      box-shadow: 0 4px 32px #2782B1cc;
+    }
+    .modern-hero-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 1em;
+      border: 3px solid #FFD700;
+      background: #fff;
+      box-shadow: 0 0 10px #FFD70055;
+    }
+    .modern-hero-role {
+      font-size: 1em;
+      color: #FFD700;
+      margin-bottom: 0.6em;
+      font-weight: 700;
+    }
+    .modern-hero-desc {
+      font-size: 0.98em;
+      color: #fff;
+      opacity: 0.93;
+    }
+
+    /* Game Section */
+    .game-wrap {
+      background: rgba(28,44,91,0.75);
+      border-radius: 24px;
+      padding: 2.4em 2em;
+      box-shadow: 0 4px 24px 0 rgba(0,0,0,0.14);
+      margin-top: 2vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 350px;
+      position: relative;
+      z-index: 2;
+    }
+    .question {
+      font-size: 1.7rem;
+      color: var(--flag-yellow);
+      font-weight: bold;
+      margin-bottom: 2em;
+      text-shadow: 2px 2px #1c2c5b;
+      text-align: center;
+      min-height: 70px;
+      animation: tada 1s;
+    }
+    .symbols-img {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #FFD700;
+      margin: 0 auto 0.7em auto;
+      display: block;
+      background: #fff;
+    }
+    .choices {
+      display: flex;
+      flex-direction: column;
+      gap: 1.1em;
+      width: 100%;
+      max-width: 440px;
+    }
+    .choice-btn {
+      background: #fff;
+      color: #1c2c5b;
+      border: none;
+      border-radius: 18px;
+      font-size: 1.15rem;
+      font-weight: bold;
+      padding: 1em 0.5em;
+      box-shadow: 0 2px 12px 0 rgba(0,0,0,0.12);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, transform 0.15s;
+      outline: none;
+      position: relative;
+      text-shadow: none;
+    }
+    .choice-btn.correct {
+      background: #5CCD6A;
+      color: #fff;
+      animation: pulse 0.8s;
+    }
+    .choice-btn.wrong {
+      background: #FF4C4C;
+      color: #fff;
+      animation: shakeX 0.7s;
+    }
+    .hero-show {
+      margin-top: 2em;
+      font-size: 1.2rem;
+      color: var(--flag-yellow);
+      text-shadow: 2px 2px #1c2c5b;
+      font-weight: bold;
+      min-height: 40px;
+      animation: fadeIn 0.9s;
+      text-align: center;
+    }
+    .score-board {
+      position: absolute;
+      top: 1em;
+      right: 1.2em;
+      font-weight: bold;
+      font-size: 1rem;
+      color: var(--flag-yellow);
+      background: rgba(28,44,91,0.17);
+      padding: 0.3em 1em;
+      border-radius: 14px;
+      box-shadow: 0 1px 6px 0 rgba(0,0,0,0.11);
+    }
+    .timer-board {
+      position: absolute;
+      top: 1em;
+      left: 1.2em;
+      font-weight: bold;
+      font-size: 1rem;
+      color: #FFD700;
+      background: rgba(28,44,91,0.17);
+      padding: 0.3em 1em;
+      border-radius: 14px;
+      box-shadow: 0 1px 6px 0 rgba(0,0,0,0.11);
+      z-index: 3;
+    }
+    .definition-pop {
+      margin-top: 1em;
+      background: #fffbe7;
+      color: #1c2c5b;
+      padding: 1em;
+      border-radius: 18px;
+      box-shadow: 0 2px 10px #FFD70033;
+      font-size: 1.07em;
+      font-weight: bold;
+      display: inline-block;
+      animation: fadeIn 1s;
+    }
+    /* Pause Overlay */
+    #pause-overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(28,44,91,0.89);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .pause-content {
+      background: #fffbe7;
+      color: #1c2c5b;
+      padding: 2em 3em;
+      border-radius: 20px;
+      box-shadow: 0 2px 20px #FFD70099;
+      text-align: center;
+    }
+    .pause-content button {
+      margin: 1em;
+    }
+    /* Center videos section */
+    .centered-videos {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .videos-gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2em;
+      justify-content: center;
+    }
+    .videos-gallery iframe {
+      width: 320px;
+      height: 180px;
+      border-radius: 10px;
+      box-shadow: 0 2px 16px #FFD70044;
+      background: #222;
+    }
+
+    /* Cool Fact/Trivia/Story Box Styles */
+    .fact-box, .trivia-box, .story-box {
+      background: linear-gradient(90deg, #fffbe7 50%, #FFD70022 100%);
+      border-left: 6px solid #FFD700;
+      border-radius: 15px;
+      box-shadow: 0 2px 8px #FFD70033;
+      margin: 1.1em 0;
+      padding: 1.1em 1.3em;
+      font-size: 1.09em;
+      color: #1c2c5b;
+      position: relative;
+      transition: box-shadow 0.18s;
+    }
+    .fact-box:before, .trivia-box:before, .story-box:before {
+      content: '';
+      position: absolute;
+      left: -10px; top: 20px;
+      width: 30px; height: 30px;
+      background: url('https://cdn-icons-png.flaticon.com/512/169/169367.png') no-repeat center;
+      background-size: contain;
+      opacity: 0.18;
+      pointer-events: none;
+    }
+    .trivia-box:before {
+      background: url('https://cdn-icons-png.flaticon.com/512/2991/2991148.png') no-repeat center;
+    }
+    .story-box:before {
+      background: url('https://cdn-icons-png.flaticon.com/512/616/616630.png') no-repeat center;
+    }
+    .fact-box:hover, .trivia-box:hover, .story-box:hover {
+      box-shadow: 0 4px 24px #FFD70055;
+    }
+
+    @media (max-width: 700px) {
+      .home-choices { flex-direction: column; align-items: center; }
+      .game-wrap { padding: 1.2em 0.6em; }
+      .score-board { right: 0.4em; }
+      .timer-board { left: 0.4em; }
+      .question { font-size: 1.2rem;}
+      .symbols-img { width: 50px; height: 50px;}
+      .videos-gallery iframe { width: 95vw; height: 28vw; }
+      .modern-hero-card { width: 90vw; max-width: 220px; }
+      .modern-heroes-wrap { gap: 1em; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Animated Philippine Flag Background -->
+  <div id="flag-bg">
+    <canvas id="flag-canvas"></canvas>
+  </div>
+  <div id="overlay"></div>
+  <header>
+    <span class="logo">Bayaning Pilipino</span>
+    <nav id="main-nav">
+      <button class="nav-btn active" data-target="home">Home</button>
+    </nav>
+    <nav id="game-nav" style="display:none;">
+      <button class="nav-btn" id="game-home-btn">Main Menu</button>
+      <button class="nav-btn" id="pause-btn">Pause</button>
+    </nav>
+  </header>
+  <main>
+    <!-- Title Card -->
+    <section class="title-card section active" id="title-section">
+      <h1 class="animate__animated animate__bounceInDown">Bayaning Pilipino</h1>
+      <p>
+        Test your knowledge of Philippine National Heroes in a vibrant, interactive game!<br>
+        Learn stories, trivia, and amazing facts about our nation's greatest heroes. Will you be the next Bayani?
+      </p>
+      <!-- Steady Play Button with SVG (no bounce animation, just glow) -->
+      <button class="start-btn" id="start-btn">
+        <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="16"/><polygon points="13,10 23,16 13,22" fill="#FFD700"/></svg>
+        Play
+      </button>
+    </section>
+    <!-- Player Name Input -->
+    <section class="player-input section" id="player-input-section">
+      <label for="player-name">Enter your hero name:</label>
+      <input id="player-name" type="text" maxlength="18" placeholder="e.g. Makisig123" required>
+      <button id="player-submit">Continue</button>
+    </section>
+    <!-- Home Section -->
+    <section class="section" id="home">
+      <div class="home-choices">
+        <div class="home-card" data-home="facts">
+          <img class="card-anim" src="https://cdn-icons-png.flaticon.com/512/6337/6337676.png" alt="Facts"/>
+          Facts
+        </div>
+        <div class="home-card" data-home="story">
+          <img class="card-anim" src="https://cdn-icons-png.flaticon.com/512/619/619034.png" alt="Story"/>
+          Story
+        </div>
+        <div class="home-card" data-home="trivia">
+          <img class="card-anim" src="https://cdn-icons-png.flaticon.com/512/147/147144.png" alt="Trivia"/>
+          Trivia
+        </div>
+        <div class="home-card" data-home="images">
+          <img class="card-anim" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Images"/>
+          Images
+        </div>
+        <div class="home-card" data-home="videos">
+          <img class="card-anim" src="https://cdn-icons-png.flaticon.com/512/854/854894.png" alt="Videos"/>
+          Videos
+        </div>
+        <div class="home-card" data-home="modern">
+          <img class="card-anim" src="https://cdn-icons-png.flaticon.com/512/1995/1995476.png" alt="Modern Heroes"/>
+          Modern Heroes
+        </div>
+        <div class="home-card" data-home="play">
+          <img class="card-anim" src="https://cdn-icons-png.flaticon.com/512/2862/2862078.png" alt="Play"/>
+          Play
+        </div>
+      </div>
+    </section>
+    <!-- Game Section -->
+    <section class="section" id="game">
+      <div class="game-wrap">
+        <span class="score-board" id="score-board">Score: 0</span>
+        <span class="timer-board" id="timer-board">Time: 15s</span>
+        <div class="question" id="game-question"></div>
+        <img id="symbol-img" class="symbols-img" src="" alt="" style="display:none;">
+        <div class="choices" id="game-choices"></div>
+        <div class="hero-show" id="hero-show"></div>
+      </div>
+      <!-- Pause Overlay -->
+      <div id="pause-overlay">
+        <div class="pause-content">
+          <h2>Game Paused</h2>
+          <button id="resume-btn" class="choice-btn">Resume</button>
+        </div>
+      </div>
+    </section>
+    <!-- About -->
+    <section class="section" id="about">
+      <div class="about-content">
+        <h2 style="color:#FFD700">About Bayaning Pilipino</h2>
+        <p>
+          <b>Bayaning Pilipino</b> is an interactive web game and learning hub made to honor and celebrate the life and legacy of Philippine National Heroes. 
+          Dive into stories, trivia, and facts about heroes such as <b>Jose Rizal, Andres Bonifacio, Apolinario Mabini, Melchora Aquino, Francisco Makabulos, Gregorio del Pilar, Marcelo H. del Pilar, Sultan Kudarat, Lapu-Lapu, and more!</b> <br><br>
+          Designed with animated Filipino motifs and upbeat music, this site aims to make history fun, engaging, and unforgettable for students and Filipinos of all ages.
+        </p>
+      </div>
+    </section>
+    <!-- Facts -->
+    <section class="section" id="facts">
+      <div class="facts-content">
+        <h2 style="color:#FFD700">Facts About Philippine Heroes</h2>
+        <!-- Cool design per fact -->
+        <div class="fact-box"><b>Francisco Makabulos</b> is known as the "Savior of Tarlac" for his decisive role in liberating the province during the Philippine Revolution.</div>
+        <div class="fact-box"><b>Jose Rizal</b> was a doctor, novelist, and the author of <i>Noli Me Tangere</i> and <i>El Filibusterismo</i>.</div>
+        <div class="fact-box"><b>Andres Bonifacio</b> is called the "Father of the Philippine Revolution" and founded the Katipunan.</div>
+        <div class="fact-box"><b>Melchora Aquino</b>, also known as "Tandang Sora," aided Katipuneros and is regarded as the "Mother of the Philippine Revolution."</div>
+        <div class="fact-box"><b>Apolinario Mabini</b> is "The Sublime Paralytic" and one of the brains of the revolution.</div>
+        <div class="fact-box"><b>Emilio Aguinaldo</b> was the first President of the Philippines and led the country to its first declaration of independence.</div>
+        <div class="fact-box"><b>Gabriela Silang</b> was the first female leader of a Filipino movement for independence from Spain.</div>
+        <div class="fact-box"><b>Antonio Luna</b> was a brilliant general and scientist, known for his fierce discipline.</div>
+        <div class="fact-box"><b>Lapu-Lapu</b> is celebrated as the first Filipino hero who resisted Spanish colonization.</div>
+        <div class="fact-box"><b>Marcelo H. del Pilar</b> was known as "Plaridel" and was a leader of the Propaganda Movement.</div>
+        <div class="fact-box"><b>Gregorio del Pilar</b> was one of the youngest generals in the Philippine Revolution.</div>
+        <div class="fact-box"><b>Sultan Kudarat</b> led Mindanao's resistance against Spanish conquest in the 17th century.</div>
+        <!-- Modern Heroes Facts -->
+        <div class="fact-box"><b>Modern Filipino Heroes</b> like doctors, nurses, teachers, and OFWs continue to save lives, educate, and support families, shaping the nation's future every day.</div>
+      </div>
+    </section>
+    <!-- Story -->
+    <section class="section" id="story">
+      <div class="story-content">
+        <h2 style="color:#FFD700">Stories of Valor</h2>
+        <!-- Cool design per story -->
+        <div class="story-box">
+          <b>Francisco Makabulos:</b> Born in Tarlac, Makabulos organized the revolutionary government in Central Luzon.<br>
+          <span style="color:#2782B1;font-weight:600;">With unwavering courage, he led his men through fierce battles, earning the title "Savior of Tarlac" and inspiring generations to stand for freedom.</span>
+        </div>
+        <div class="story-box">
+          <b>Jose Rizal:</b> A man of many talents, Rizal's writings sparked the flames of revolution.<br>
+          <span style="color:#FFD700;font-weight:600;">His novels awakened national pride and hope, and his martyrdom united Filipinos to fight for justice and dignity.</span>
+        </div>
+        <div class="story-box">
+          <b>Andres Bonifacio:</b> A self-made hero, Bonifacio led the Katipunan against Spanish oppression.<br>
+          <span style="color:#ce1126;font-weight:600;">His leadership and bravery in the face of danger made him a legend—his spirit remains alive in every Filipino fighting for freedom.</span>
+        </div>
+        <div class="story-box">
+          <b>Gabriela Silang:</b> After her husband's assassination, she led forces against the Spanish, fighting bravely for Ilocos and for freedom.<br>
+          <span style="color:#27B185;font-weight:600;">Her courage blazed a trail for women in leadership, proving that heroism knows no gender.</span>
+        </div>
+        <div class="story-box">
+          <b>Lapu-Lapu:</b> He led Mactan warriors in 1521 and was the first Filipino to resist foreign domination, defeating Ferdinand Magellan.<br>
+          <span style="color:#B1274A;font-weight:600;">His victory showed the world the power of unity and the strength of the Filipino spirit.</span>
+        </div>
+        <div class="story-box">
+          <b>Sultan Kudarat:</b> Led Mindanao's sultanates against Spanish colonization, uniting various Muslim groups in the resistance.<br>
+          <span style="color:#FFD700;font-weight:600;">His wisdom and determination kept the flame of freedom burning in Mindanao for centuries.</span>
+        </div>
+        <!-- Modern Heroes Story -->
+        <div class="story-box">
+          <b>Modern Filipino Heroes:</b> Today, heroism is found in the everyday acts of courage and compassion.<br>
+          <span style="color:#27B185;font-weight:600;">
+            Doctors and nurses battle unseen enemies in hospitals, risking their lives for others.<br>
+            Teachers unlock the minds of the next generation, planting seeds of hope.<br>
+            Volunteer responders, OFWs, and community leaders uplift lives in times of crisis.<br>
+            These modern heroes remind us: <i>Anyone can be a Bayani.</i>
+          </span>
+        </div>
+      </div>
+    </section>
+    <!-- Trivia -->
+    <section class="section" id="trivia">
+      <div class="trivia-content">
+        <h2 style="color:#FFD700">Heroic Trivia</h2>
+        <!-- Cool design per trivia -->
+        <div class="trivia-box">Jose Rizal could speak more than 20 languages!</div>
+        <div class="trivia-box">Andres Bonifacio worked as a warehouseman and sold canes and paper fans before becoming a revolutionary leader.</div>
+        <div class="trivia-box">Melchora Aquino was already 84 years old when she helped the Katipuneros.</div>
+        <div class="trivia-box">Francisco Makabulos created his own secret code used to communicate plans with fellow revolutionaries.</div>
+        <div class="trivia-box">Gregorio del Pilar died heroically at age 24 defending Tirad Pass.</div>
+        <div class="trivia-box">Lapu-Lapu is celebrated every April 27, the day of the Battle of Mactan.</div>
+        <div class="trivia-box">Antonio Luna was a scientist and wrote scientific papers before leading troops as a general.</div>
+        <div class="trivia-box">Marcelo H. del Pilar's pen name was "Plaridel".</div>
+        <div class="trivia-box">Many modern Filipino heroes risk their lives daily—frontliners, teachers, and volunteers are celebrated every August as "National Heroes Month."</div>
+      </div>
+    </section>
+    <!-- Images Section -->
+    <section class="section" id="images">
+      <div class="images-content" style="max-width:900px;">
+        <h2 style="color:#FFD700; margin-bottom:1.5em;">Philippine Heroes Gallery</h2>
+        <div style="display:flex; flex-wrap:wrap; gap:2em; justify-content:center;">
+          <div style="text-align:center;">
+            <a href="https://en.wikipedia.org/wiki/Lapu-Lapu" target="_blank">
+              <img src="https://mandirigma.org/wp-content/uploads/2011/01/lapulapu-257x300.jpg" alt="Lapu-Lapu" style="width:150px; border-radius:20px; box-shadow:0 2px 16px #FFD700;">
+            </a>
+            <div style="margin-top:0.7em; color:#FFD700; font-weight:bold;">Lapu-Lapu</div>
+          </div>
+          <div style="text-align:center;">
+            <a href="https://en.wikipedia.org/wiki/Sultan_Kudarat" target="_blank">
+              <img src="https://kahimyang.com/resources/sultan-kudarat.webp" alt="Sultan Kudarat" style="width:150px; border-radius:20px; box-shadow:0 2px 16px #FFD700;">
+            </a>
+            <div style="margin-top:0.7em; color:#FFD700; font-weight:bold;">Sultan Kudarat</div>
+          </div>
+          <div style="text-align:center;">
+            <a href="https://en.wikipedia.org/wiki/Gregorio_del_Pilar" target="_blank">
+              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXUBw26o2rGdVo3n63HDJXtX-snyRkz0ojWlZpLsIEuLmamYX0-dW1LUgNM8bG3rIYsvc&usqp=CAU" alt="Gregorio del Pilar" style="width:150px; border-radius:20px; box-shadow:0 2px 16px #FFD700;">
+            </a>
+            <div style="margin-top:0.7em; color:#FFD700; font-weight:bold;">Gregorio del Pilar</div>
+          </div>
+          <div style="text-align:center;">
+            <a href="https://en.wikipedia.org/wiki/Francisco_Makabulos" target="_blank">
+              <img src="https://upload.wikimedia.org/wikipedia/en/thumb/5/58/Francisco_Maabulos.jpg/250px-Francisco_Maabulos.jpg" alt="Francisco Makabulos" style="width:150px; border-radius:20px; box-shadow:0 2px 16px #FFD700;">
+            </a>
+            <div style="margin-top:0.7em; color:#FFD700; font-weight:bold;">Francisco Makabulos</div>
+          </div>
+          <div style="text-align:center;">
+            <a href="https://en.wikipedia.org/wiki/Melchora_Aquino" target="_blank">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/9/92/Melchora_Aquino_de_Ramos.jpg" alt="Melchora Aquino" style="width:150px; border-radius:20px; box-shadow:0 2px 16px #FFD700;">
+            </a>
+            <div style="margin-top:0.7em; color:#FFD700; font-weight:bold;">Melchora Aquino</div>
+          </div>
+          <div style="text-align:center;">
+            <a href="https://en.wikipedia.org/wiki/Apolinario_Mabini" target="_blank">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/f/f5/Apolinario_Mabini.jpg" alt="Apolinario Mabini" style="width:150px; border-radius:20px; box-shadow:0 2px 16px #FFD700;">
+            </a>
+            <div style="margin-top:0.7em; color:#FFD700; font-weight:bold;">Apolinario Mabini</div>
+          </div>
+          <div style="text-align:center;">
+            <a href="https://en.wikipedia.org/wiki/Andres_Bonifacio" target="_blank">
+              <img src="https://philippineculturaleducation.com.ph/wp-content/uploads/2017/10/sk-bonifacio-andres.jpg" alt="Andres Bonifacio" style="width:150px; border-radius:20px; box-shadow:0 2px 16px #FFD700;">
+            </a>
+            <div style="margin-top:0.7em; color:#FFD700; font-weight:bold;">Andres Bonifacio</div>
+          </div>
+          <div style="text-align:center;">
+            <a href="https://en.wikipedia.org/wiki/Jos%C3%A9_Rizal" target="_blank">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/c/c9/Jose_Rizal_full.jpg" alt="Jose Rizal" style="width:150px; border-radius:20px; box-shadow:0 2px 16px #FFD700;">
+            </a>
+            <div style="margin-top:0.7em; color:#FFD700; font-weight:bold;">Jose Rizal</div>
+          </div>
+         <div style="text-align:center;">
+        <a href="https://en.wikipedia.org/wiki/Antonio_Luna" target="_blank">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Antonio_luna_small.jpg/500px-Antonio_luna_small.jpg" alt="Antonio Luna" style="width:150px; border-radius:20px; box-shadow:0 2px 16px #FFD700;">
+        </a>
+        <div style="margin-top:0.7em; color:#FFD700; font-weight:bold;">Antonio Luna</div>
+      </div>
+          <div style="text-align:center;">
+            <a href="https://en.wikipedia.org/wiki/Emilio_Aguinaldo" target="_blank">
+              <img src="https://www.onthisday.com/images/people/emilio-aguinaldo.jpg?w=360" alt="Emilio Aguinaldo" style="width:150px; border-radius:20px; box-shadow:0 2px 16px #FFD700;">
+            </a>
+            <div style="margin-top:0.7em; color:#FFD700; font-weight:bold;">Emilio Aguinaldo</div>
+          </div>
+          <div style="text-align:center;">
+            <a href="https://en.wikipedia.org/wiki/Gabriela_Silang" target="_blank">
+              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8UUyJCcmmUTpl8dtiVHW1IJbQieacrS4R_VWcTmBJirHNVH87qFgT5aBvi2MFB0bxHLg&usqp=CAU" alt="Gabriela Silang" style="width:150px; border-radius:20px; box-shadow:0 2px 16px #FFD700;">
+            </a>
+            <div style="margin-top:0.7em; color:#FFD700; font-weight:bold;">Gabriela Silang</div>
+          </div>
+        </div>
+      </div>
+    </section>
+   <!-- ...Modern Heroes Section... -->
+<section class="section" id="modern">
+  <div style="text-align:center;">
+    <h2 style="color:#FFD700; margin-bottom:1.5em;">Modern Heroes Gallery</h2>
+    <div class="modern-heroes-wrap">
+      <div class="modern-hero-card">
+        <img class="modern-hero-img" src="https://cdn.prod.website-files.com/66bd394eedeb9d6ee29898c6/682f5450a046c241920c1e6f_Three%20doctors%20standing%20side%20by%20side%2C%20crossing%20their%20arms.jpg" alt="Doctors Team"/>
+        <div class="modern-hero-role">Doctors Team</div>
+        <div class="modern-hero-desc">United in service, Filipino doctors work together to heal and save lives.</div>
+      </div>
+      <div class="modern-hero-card">
+        <img class="modern-hero-img" src="https://onlinepostgrad.com/wp-content/uploads/2023/09/shutterstock_2131435977-1.jpg" alt="Nurse"/>
+        <div class="modern-hero-role">Nurse</div>
+        <div class="modern-hero-desc">Providing care and compassion, nurses bring hope and healing every day.</div>
+      </div>
+      <div class="modern-hero-card">
+        <img class="modern-hero-img" src="https://www.altermidya.net/wp-content/uploads/2023/09/teacher_classroom_02.webp" alt="Teacher"/>
+        <div class="modern-hero-role">Teacher</div>
+        <div class="modern-hero-desc">Empowering the next generation, teachers build the future of the nation.</div>
+      </div>
+      <div class="modern-hero-card">
+       <img class="modern-hero-img" src="https://propertyreport.ph/wp-content/uploads/2024/10/ofw-housing-2.jpg" alt="OFW"/>
+        <div class="modern-hero-role">OFW</div>
+        <div class="modern-hero-desc">Working abroad to support their families and the country, OFWs are heroes of sacrifice and love.</div>
+      </div>
+       <div class="modern-hero-card">
+        <img class="modern-hero-img" src="https://factsmgt.com/wp-content/uploads/5-Benefits-of-Volunteering-at-Your-Childrens-School.jpg" alt="Volunteers"/>
+        <div class="modern-hero-role">Volunteers</div>
+        <div class="modern-hero-desc">Risking their own safety in times of disaster, volunteers show true bayanihan spirit.</div>
+      </div>
+      <div class="modern-hero-card">
+        <img class="modern-hero-img" src="http://media.philstar.com/images/the-philippine-star/headlines/20160122/AFP-PNP-Army-Police.jpg" alt="Frontliners (AFP/PNP)"/>
+        <div class="modern-hero-role">AFP & PNP Frontliners</div>
+        <div class="modern-hero-desc">Serving and protecting the Filipino people, the Armed Forces and National Police are the backbone of national safety and security.</div>
+      </div>
+      <div class="modern-hero-card">
+        <img class="modern-hero-img" src="https://www.mendingkids.org/uploads/1/1/8/2/118210340/33613852745-60e10de10e-4k_orig.jpg" alt="Medical Volunteer"/>
+        <div class="modern-hero-role">Medical Volunteer</div>
+        <div class="modern-hero-desc">Medical volunteers bring hope and healing to the less privileged, embodying the spirit of bayanihan across the nation.</div>
+      </div>
+    </div>
+    <p style="margin-top:1.5em; color:#FFD700; font-size:1em;">
+      <i>Modern heroes inspire us with their everyday acts of courage, kindness, and selflessness.</i>
+    </p>
+  </div>
+</section>
+    <!-- Videos Section -->
+    <section class="section" id="videos">
+      <div class="videos-content centered-videos">
+        <h2 style="color:#FFD700">Heroic Videos</h2>
+        <div class="videos-gallery">
+          <iframe src="https://www.youtube.com/embed/KX0DlHQ22cw?start=79" frameborder="0" allowfullscreen title="Video 1"></iframe>
+          <iframe src="https://www.youtube.com/embed/BeOr_tbdQTU" frameborder="0" allowfullscreen title="Video 2"></iframe>
+          <iframe src="https://www.youtube.com/embed/AHljkh-1Dng" frameborder="0" allowfullscreen title="Video 3"></iframe>
+          <iframe src="https://www.youtube.com/embed/SCnUChSXErA" frameborder="0" allowfullscreen title="Video 4"></iframe>
+          <iframe src="https://www.youtube.com/embed/h63qV4a9u3M" frameborder="0" allowfullscreen title="Video 5"></iframe>
+          <iframe src="https://www.youtube.com/embed/wM-eaS0R2YY" frameborder="0" allowfullscreen title="Video 6"></iframe>
+          <iframe src="https://www.youtube.com/embed/7WONj7Mw_v0" frameborder="0" allowfullscreen title="Video 7"></iframe>
+          <iframe src="https://www.youtube.com/embed/AzB7jBGfHgA" frameborder="0" allowfullscreen title="Video 9"></iframe>
+          <iframe src="https://www.youtube.com/embed/uVtyH1a-ypE" frameborder="0" allowfullscreen title="Video 10"></iframe>
+          <iframe src="https://www.youtube.com/embed/7d9AJc9sg0Y" frameborder="0" allowfullscreen title="Video 11"></iframe>
+          <iframe src="https://www.youtube.com/embed/LOxqC1yzGJY" frameborder="0" allowfullscreen title="Video 12"></iframe>
+        </div>
+        <p style="margin-top:1.5em; color:#FFD700; font-size:1em;">
+          <i>All videos are embedded for educational purposes. For more, visit YouTube and search for Philippine Heroes documentaries.</i>
+        </p>
+      </div>
+    </section>
+  </main>
+  <audio id="bg-music" src="https://cdn.pixabay.com/audio/2023/03/13/audio_128b3a1b84.mp3" autoplay loop></audio>
+  <script>
+    // ================== PH FLAG CANVAS ANIMATION ==================
+    function flagDraw() {
+      const cvs = document.getElementById('flag-canvas');
+      const ctx = cvs.getContext('2d');
+      function resizeFlag() {
+        cvs.width = window.innerWidth;
+        cvs.height = window.innerHeight;
+      }
+      resizeFlag();
+      window.addEventListener('resize', resizeFlag);
+      let t = 0;
+      function draw() {
+        const W = cvs.width, H = cvs.height;
+        ctx.clearRect(0,0,W,H);
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(0,0);
+        for(let x=0;x<=W;x+=10){
+          let y = 0.27*H + Math.sin((x/110)+(t/24))*15;
+          ctx.lineTo(x, y);
+        }
+        ctx.lineTo(W,0);
+        ctx.lineTo(W,0.32*H);
+        for(let x=W;x>=0;x-=10){
+          let y = 0.32*H + Math.sin((x/120)+(t/19))*12;
+          ctx.lineTo(x, y);
+        }
+        ctx.lineTo(0,0);
+        ctx.closePath();
+        ctx.fillStyle="#0033a0";
+        ctx.globalAlpha=0.92;
+        ctx.fill();
+        ctx.restore();
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(0,H);
+        for(let x=0;x<=W;x+=10){
+          let y = H-0.27*H + Math.sin((x/90)+(t/18))*14;
+          ctx.lineTo(x, y);
+        }
+        ctx.lineTo(W,H);
+        ctx.lineTo(W,H-0.32*H);
+        for(let x=W;x>=0;x-=10){
+          let y = H-0.32*H + Math.sin((x/110)+(t/21))*10;
+          ctx.lineTo(x, y);
+        }
+        ctx.lineTo(0,H);
+        ctx.closePath();
+        ctx.fillStyle="#ce1126";
+        ctx.globalAlpha=0.92;
+        ctx.fill();
+        ctx.restore();
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(0,0);
+        ctx.lineTo(0,H);
+        ctx.lineTo(0.32*W,H/2);
+        ctx.closePath();
+        ctx.fillStyle="#fff";
+        ctx.globalAlpha=0.85;
+        ctx.fill();
+        ctx.restore();
+        ctx.save();
+        ctx.translate(0.11*W, H/2);
+        ctx.rotate(Math.sin(t/40)*0.09);
+        ctx.globalAlpha=0.88;
+        ctx.beginPath();
+        ctx.arc(0,0,33,0,2*Math.PI);
+        ctx.fillStyle="#ffd700";
+        ctx.shadowColor="#FFD700";
+        ctx.shadowBlur = 22;
+        ctx.fill();
+        for(let i=0;i<8;i++){
+          ctx.save();
+          ctx.rotate(i*Math.PI/4);
+          ctx.beginPath();
+          ctx.moveTo(0,-49);
+          ctx.lineTo(7,-37);
+          ctx.lineTo(-7,-37);
+          ctx.closePath();
+          ctx.fillStyle="#FFD700";
+          ctx.globalAlpha=0.95;
+          ctx.shadowBlur=0;
+          ctx.fill();
+          ctx.restore();
+        }
+        ctx.restore();
+        function drawStar(x,y,r){
+          ctx.save();
+          ctx.translate(x,y);
+          ctx.rotate(t/30);
+          ctx.beginPath();
+          for(let i=0;i<5;i++){
+            ctx.lineTo(
+              Math.cos((18+i*72)/180*Math.PI)*r,
+              Math.sin((18+i*72)/180*Math.PI)*r
+            );
+            ctx.lineTo(
+              Math.cos((54+i*72)/180*Math.PI)*r/2.5,
+              Math.sin((54+i*72)/180*Math.PI)*r/2.5
+            );
+          }
+          ctx.closePath();
+          ctx.fillStyle="#FFD700";
+          ctx.shadowColor="#FFD700";
+          ctx.shadowBlur=10;
+          ctx.globalAlpha=0.88;
+          ctx.fill();
+          ctx.restore();
+        }
+        drawStar(0.16*W,0.21*H,18);
+        drawStar(0.16*W,H-0.21*H,18);
+        drawStar(0.05*W,H/2,18);
+        t++;
+        requestAnimationFrame(draw);
+      }
+      draw();
+    }
+    flagDraw();
+
+    // ========== NAVIGATION ===========
+    const navBtns = document.querySelectorAll('.nav-btn');
+    const sections = document.querySelectorAll('.section');
+    const mainNav = document.getElementById('main-nav');
+    const gameNav = document.getElementById('game-nav');
+    function showSection(sectionId) {
+      sections.forEach(sec => sec.classList.remove('active'));
+      if(sectionId === 'game') {
+        mainNav.style.display = 'none';
+        gameNav.style.display = 'flex';
+      } else {
+        mainNav.style.display = 'flex';
+        gameNav.style.display = 'none';
+      }
+      document.getElementById(sectionId).classList.add('active');
+      navBtns.forEach(btn => btn.classList.remove('active'));
+      if(sectionId === 'home') {
+        document.querySelector('[data-target="home"]').classList.add('active');
+      }
+    }
+    navBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        showSection(btn.dataset.target);
+      });
+    });
+
+    // ========== TITLE TO NAME INPUT ===========
+    document.getElementById('start-btn').addEventListener('click', () => {
+      showSection('player-input-section');
+    });
+    document.getElementById('player-submit').addEventListener('click', () => {
+      const name = document.getElementById('player-name').value.trim();
+      if (name.length < 2) {
+        alert("Please enter a valid hero name (at least 2 characters).");
+        return;
+      }
+      playerName = name;
+      showSection('home');
+    });
+    document.querySelectorAll('.home-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const type = card.dataset.home;
+        if (type === 'play') {
+          startGame();
+        } else {
+          showSection(type);
+        }
+      });
+    });
+
+    // ========== GAME NAVIGATION ===========
+    document.getElementById('game-home-btn').addEventListener('click', () => {
+      clearInterval(timerInterval);
+      showSection('home');
+    });
+    document.getElementById('pause-btn').addEventListener('click', () => {
+      pauseGame();
+    });
+    document.getElementById('resume-btn').addEventListener('click', () => {
+      resumeGame();
+    });
+
+    function pauseGame() {
+      clearInterval(timerInterval);
+      document.getElementById('pause-overlay').style.display = 'flex';
+    }
+    function resumeGame() {
+      document.getElementById('pause-overlay').style.display = 'none';
+      if (timerLeft > 0 && gameQn < questions.length) {
+        startTimer();
+      }
+    }
+    function hidePauseOverlay() {
+      document.getElementById('pause-overlay').style.display = 'none';
+    }
+
+    // HERO SYMBOLS QUIZ LOGIC
+    const HEROES = [
+      {
+        name: "Francisco Makabulos",
+        symbol: "https://upload.wikimedia.org/wikipedia/en/thumb/5/58/Francisco_Maabulos.jpg/250px-Francisco_Maabulos.jpg",
+        definition: "The Savior of Tarlac, led revolutionary forces in Central Luzon."
+      },
+      {
+        name: "Jose Rizal",
+        symbol: "https://upload.wikimedia.org/wikipedia/commons/c/c9/Jose_Rizal_full.jpg",
+        definition: "National Hero, polymath, and author of Noli Me Tangere."
+      },
+      {
+        name: "Andres Bonifacio",
+        symbol: "https://philippineculturaleducation.com.ph/wp-content/uploads/2017/10/sk-bonifacio-andres.jpg",
+        definition: "Father of the Philippine Revolution and founder of Katipunan."
+      },
+      {
+        name: "Melchora Aquino",
+        symbol: "https://upload.wikimedia.org/wikipedia/commons/9/92/Melchora_Aquino_de_Ramos.jpg",
+        definition: "Known as Tandang Sora, Mother of the Philippine Revolution."
+      },
+      {
+        name: "Apolinario Mabini",
+        symbol: "https://upload.wikimedia.org/wikipedia/commons/f/f5/Apolinario_Mabini.jpg",
+        definition: "The Sublime Paralytic, prime adviser of the revolution."
+      },
+      {
+        name: "Emilio Aguinaldo",
+        symbol: "https://www.onthisday.com/images/people/emilio-aguinaldo.jpg?w=360",
+        definition: "First President of the Philippines, led the 1898 independence."
+      },
+      {
+        name: "Gabriela Silang",
+        symbol: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8UUyJCcmmUTpl8dtiVHW1IJbQieacrS4R_VWcTmBJirHNVH87qFgT5aBvi2MFB0bxHLg&usqp=CAU",
+        definition: "First female leader of a Filipino movement for independence."
+      },
+      {
+        name: "Antonio Luna",
+        symbol: "https://static.wikia.nocookie.net/artikulo-uno/images/8/83/History_Antonio_Luna.png/revision/latest/thumbnail/width/360/height/360?cb=20190222095713",
+        definition: "Brilliant general and scientist, known for strict discipline."
+      },
+      {
+        name: "Gregorio del Pilar",
+        symbol: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXUBw26o2rGdVo3n63HDJXtX-snyRkz0ojWlZpLsIEuLmamYX0-dW1LUgNM8bG3rIYsvc&usqp=CAU",
+        definition: "Youngest general; hero of Tirad Pass."
+      },
+      {
+        name: "Marcelo H. del Pilar",
+        symbol: "https://upload.wikimedia.org/wikipedia/commons/5/56/Marcelo_H._del_Pilar.jpg",
+        definition: "Plaridel, Propaganda Movement leader, journalist."
+      },
+      {
+        name: "Lapu-Lapu",
+        symbol: "https://mandirigma.org/wp-content/uploads/2011/01/lapulapu-257x300.jpg",
+        definition: "Hero of Mactan, first to resist Spanish rule."
+      },
+      {
+        name: "Sultan Kudarat",
+        symbol: "https://kahimyang.com/resources/sultan-kudarat.webp",
+        definition: "Muslim Sultan who led Mindanao's resistance to Spain."
+      }
+    ];
+    let playerName = "";
+    let gameScore = 0;
+    let gameQn = 0;
+    let questions = [];
+    let gameAnswered = false;
+    let timerInterval = null;
+    let timerLeft = 15;
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+    function makeGameQuestions() {
+      let arr = [];
+      HEROES.forEach(hero => {
+        let others = HEROES.filter(h => h.name !== hero.name);
+        let choiceSet = shuffle([hero.name,
+          ...shuffle(others).slice(0,3).map(h=>h.name)
+        ]);
+        arr.push({
+          hero: hero.name,
+          symbol: hero.symbol,
+          definition: hero.definition,
+          choices: choiceSet
+        });
+      });
+      return shuffle(arr);
+    }
+    function startGame() {
+      questions = makeGameQuestions();
+      gameScore = 0;
+      gameQn = 0;
+      showSection('game');
+      hidePauseOverlay();
+      showGameQuestion();
+      updateGameScore();
+    }
+    function showGameQuestion() {
+      gameAnswered = false;
+      document.getElementById('hero-show').innerHTML = "";
+      document.getElementById('game-choices').innerHTML = "";
+      document.getElementById('symbol-img').style.display = "none";
+      document.getElementById('timer-board').textContent = "Time: 15s";
+      hidePauseOverlay();
+      if (gameQn >= questions.length) {
+        document.getElementById('game-question').innerHTML = `Congratulations, ${playerName}!<br>Your Final Score: <span style="color:#5CCD6A">${gameScore}</span>`;
+        document.getElementById('game-choices').innerHTML = '';
+        document.getElementById('symbol-img').style.display = "none";
+        document.getElementById('hero-show').innerHTML = `<button onclick="startGame()" class="choice-btn" style="margin-top:2em;">Play Again</button>`;
+        clearInterval(timerInterval);
+        document.getElementById('timer-board').textContent = "";
+        return;
+      }
+      let q = questions[gameQn];
+      document.getElementById('game-question').innerHTML = "Who is this hero?<br><span style='font-size:1em;color:#FFD700;'>" + q.definition + "</span>";
+      let img = document.getElementById('symbol-img');
+      img.src = q.symbol;
+      img.alt = q.hero;
+      img.style.display = "block";
+      document.getElementById('game-choices').innerHTML = "";
+      q.choices.forEach(choice => {
+        let btn = document.createElement('button');
+        btn.className = 'choice-btn animate__animated animate__fadeInUp';
+        btn.textContent = choice;
+        btn.onclick = () => handleGameAnswer(btn, q, choice);
+        document.getElementById('game-choices').appendChild(btn);
+      });
+      timerLeft = 15;
+      document.getElementById('timer-board').textContent = `Time: ${timerLeft}s`;
+      startTimer();
+    }
+    function startTimer() {
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timerLeft--;
+        document.getElementById('timer-board').textContent = `Time: ${timerLeft}s`;
+        if (timerLeft <= 0) {
+          clearInterval(timerInterval);
+          showCorrectPopup(questions[gameQn], null);
+          setTimeout(() => {
+            gameQn++;
+            showGameQuestion();
+          }, 2200);
+        }
+      }, 1000);
+    }
+    function handleGameAnswer(btn, q, selected) {
+      if (gameAnswered) return;
+      gameAnswered = true;
+      clearInterval(timerInterval);
+      let allBtns = Array.from(document.querySelectorAll('.choice-btn'));
+      allBtns.forEach(b => {
+        b.disabled = true;
+        if (b.textContent === q.hero) {
+          b.classList.add('correct');
+        }
+        if (b.textContent === selected && selected !== q.hero) {
+          b.classList.add('wrong');
+        }
+      });
+      let isCorrect = (selected === q.hero);
+      if (isCorrect) gameScore++;
+      showCorrectPopup(q, selected);
+      setTimeout(() => {
+        gameQn++;
+        showGameQuestion();
+      }, 1800);
+    }
+    function showCorrectPopup(q, selected) {
+      let html = `
+        <div class="definition-pop animate__animated animate__fadeIn">
+          <span style="font-size:1.09em;color:#FFD700;">${q.hero}</span>
+          <br>
+          <span>${q.definition}</span>
+          <br>
+          <span style="font-size:1em;color:${selected ? (selected === q.hero ? '#5CCD6A' : '#FF4C4C') : '#FF4C4C'};font-weight:bold;">
+            ${selected ? (selected === q.hero ? 'Correct!' : 'Incorrect!') : 'Time\'s up!'}
+          </span>
+        </div>
+      `;
+      document.getElementById('hero-show').innerHTML = html;
+      updateGameScore();
+    }
+    function updateGameScore() {
+      document.getElementById('score-board').textContent = `Score: ${gameScore}`;
+    }
+    // Prevent spacebar scroll in game
+    window.addEventListener('keydown', function(e) {
+      if(document.getElementById('game').classList.contains('active') && e.keyCode === 32) {
+        e.preventDefault();
+      }
+    });
+
+    // ========== SECURITY/DISABLE FEATURES ==========
+    document.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+    });
+    document.addEventListener('keydown', function(e) {
+      if (
+        e.keyCode === 123 || // F12
+        (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 67)) || // Ctrl+Shift+I/C
+        (e.ctrlKey && e.keyCode === 85) // Ctrl+U
+      ) {
+        e.preventDefault();
+        return false;
+      }
+    });
+  </script>
+</body>
+</html>
